@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #results ul {
+            list-style: none;
+            padding-left: 0
+        }
+
+        #results li {
+            display: flex;
+            padding: 6px;
+            align-items: center;
+        }
+
+        #results .color {
+            border-radius: 50%;
+            border: solid 1px black;
+            width: 12px;
+            height: 12px;
+        }
+
+        #results .name {
+            margin-left: 6px;
+        }
+    </style>
+</head>
+<body>
+<form id="form">
+    город:
+    <select id="citySelect">
+        <option value="">не выбран</option>
+        <option value="1">Санкт-Петербург</option>
+    </select>
+    станция:
+    <input id="stationInput" autocomplete="off">
+    <span id="status">
+   </span>
+    <div id="results">
+    </div>
+</form>
+
+<script type="text/javascript">
+    let cityId = '';
+    let searchInput = '';
+
+    onCitySelectChange = function (el) {
+        displayStatus(''); //TODO: не нужна строка, так как в doSearchRequest статус сразу же обновляется
+        displayResults([]);
+        cityId = el.target.value;
+        doSearchRequest();
+    };
+    onStationInputChange = function (el) {
+        displayStatus(''); //TODO: не нужна строка, так как в doSearchRequest статус сразу же обновляется
+        displayResults([]);
+        searchInput = el.target.value;
+        doSearchRequest();
+    };
+    doSearchRequest = function () {
+        displayStatus('Выполняется поиск...');
+
+        const requestCityId = cityId;
+        const requestSearchInput = searchInput;
+        fetch("/findStations?city=" + cityId + "&term=" + searchInput)
+            .then(response => {
+                return response.json();
+            })
+            .then(response => {
+                if (requestCityId === cityId && requestSearchInput === searchInput) {
+                    if (response.status !== 'ok') { //TODO: есть св-во response.ok - лучше проверять его
+                        displayStatus(response.error || 'Неизвестная ошибка сервера')
+                    } else {
+                        displayStatus('Найдено: ' + response.data.results.length);
+                        displayResults(response.data.results);
+                    }
+                }
+            })
+            .catch((error) => {
+                displayStatus('Ошибка при обработке ответа сервера');
+            });
+    };
+    displayStatus = function (message) {
+        document.getElementById('status').innerHTML = message;
+    };
+    displayResults = function (results) {
+        document.getElementById('results').innerHTML = '<ul>' + results.map((item) => {
+            return '<li><div class="color"></div><div class="name">' + item.name + '</div></li>'
+        }).join('') + '</ul>';
+    };
+
+    document.getElementById('form').onsubmit = (e) => {  //TODO: зачем нужен этот блок? мы не отправляем форму
+        e.preventDefault()
+    };
+    document.getElementById('citySelect').addEventListener('change', onCitySelectChange);
+    document.getElementById('stationInput').addEventListener('input', onStationInputChange);
+
+</script>
+</body>
+
+</html>
