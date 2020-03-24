@@ -19,7 +19,7 @@ class Controller
         if (method_exists(self::class, $method)){
             self::$method();
         }
-        else{
+        else {
             require_once dirname(__DIR__).'/Views/main.php';
         }
 
@@ -42,16 +42,17 @@ class Controller
         }
 
         if (!$city == null){
-            $query = "SELECT * FROM station where station.name like '%$term%' 
-            and shop_id = (SELECT id from shop where city_id = $city) limit 3";
+
+            $query = "SELECT * FROM station where station.name like '%$term%' and shop_id = (SELECT id from shop where city_id = $city) limit 3";
+//            $query = "SELECT * FROM `station` WHERE MATCH (`name`) AGAINST ('$term*' IN BOOLEAN MODE) and shop_id = (SELECT id from shop where city_id = $city) limit 3"; //TODO:: релевантный поиск
+
             $data = static::$conn::exec($query);
             $counter = static::$conn::count($query);
+
         }
         else{
-
-            $query = "SELECT * FROM station where station.name like '%$term%' limit 3";
-            $data = static::$conn::exec($query);
-            $counter = static::$conn::count($query);
+            header("HTTP/1.1 406 Select the city first");
+            die();
         }
 
         $response = ['data' => $data, 'counter' => $counter[0]['counter']];

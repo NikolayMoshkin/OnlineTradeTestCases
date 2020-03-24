@@ -48,12 +48,16 @@ class DB
                 color varchar(64),
                 shop_id int not null,
                 constraint station_shop_id_fk
-                foreign key (shop_id) references shop (id)
-                );
+                foreign key (shop_id) references shop (id),
+                FULLTEXT (name)
+                ) ENGINE=InnoDB;
                 
                 insert into city (name) values ('London'), ('Moskow'), ('Barcelona');
                 insert into shop (city_id, lat, lng) values (1, 54.54, 34.45), (2, 54.58, 34.46), (3, 54.62, 34.48);
-                insert into station (name , color, shop_id) values ('Петроградская', 'Синий', 1), ('Комендантский проспект', 'Фиолетовый', 2), ('Ладожская', 'Желтый', 3), ('Пионерская', 'Синий', 1);
+                insert into station (name , color, shop_id) values ('Петроградская', 'Синий', 1), ('Комендантский проспект', 'Фиолетовый', 2), 
+                ('Гражданский проспект', 'Желтый', 1), ('Озерки', 'Синий', 1),
+                ('Беговая', 'Желтый', 1), ('Старая деревня', 'Синий', 1),
+                ('Горьковская', 'Желтый', 1), ('Дыбенко', 'Синий', 1);
                 
         ";
 
